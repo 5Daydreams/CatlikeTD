@@ -9,6 +9,12 @@ public class Game : MonoBehaviour
     [SerializeField] GameBoard board = default;
     [SerializeField] Vector2Int boardSize = new Vector2Int(11, 11);
 
+    [SerializeField] EnemyFactory enemyFactory = default;
+    [SerializeField, Range(0.1f, 10f)] float spawnSpeed = 1f;
+
+    float spawnProgress = 0.0f;
+
+    EnemyCollection enemies = new EnemyCollection();
     Ray TouchRay => Camera.main.ScreenPointToRay(Input.mousePosition);
 
     void Awake()
@@ -49,6 +55,24 @@ public class Game : MonoBehaviour
         {
             board.ShowGrid = !board.ShowGrid;
         }
+
+        spawnProgress += spawnSpeed * Time.deltaTime;
+        while (spawnProgress >= 1f)
+        {
+            spawnProgress -= 1f;
+            SpawnEnemy();
+        }
+
+        enemies.GameUpdate();
+    }
+
+    void SpawnEnemy()
+    {
+        GameTile spawnPoint =
+            board.GetSpawnPoint(Random.Range(0, board.SpawnPointCount));
+        Enemy enemy = enemyFactory.Get();
+        enemy.SpawnOn(spawnPoint);
+        enemies.Add(enemy);
     }
 
     void HandleTouch() // currently turns target tiles into destination tiles
@@ -65,7 +89,14 @@ public class Game : MonoBehaviour
         GameTile tile = board.GetTile(TouchRay);
         if (tile != null)
         {
-            board.ToggleDestination(tile);
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                board.ToggleDestination(tile);
+            }
+            else
+            {
+                board.ToggleSpawnPoint(tile);
+            }
         }
     }
 }

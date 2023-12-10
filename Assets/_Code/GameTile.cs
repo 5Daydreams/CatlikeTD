@@ -5,7 +5,6 @@ using UnityEngine;
 public class GameTile : MonoBehaviour
 {
     [SerializeField] Transform arrow = default;
-
     public bool IsAlternative { get; set; }
     public bool HasPath => distance != int.MaxValue;
 
@@ -17,6 +16,8 @@ public class GameTile : MonoBehaviour
 
     int distance;
     GameTileContent content;
+
+
     public GameTileContent Content
     {
         get => content;
@@ -33,6 +34,8 @@ public class GameTile : MonoBehaviour
     }
 
     GameTile north, east, south, west, nextOnPath;
+    public GameTile NextTileOnPath => nextOnPath;
+
 
     GameTile GrowPathTo(GameTile neighbor)
     {
@@ -53,6 +56,8 @@ public class GameTile : MonoBehaviour
         }
         //return neighbor;
     }
+
+
 
     public GameTile GrowPathNorth() => GrowPathTo(north);
 
