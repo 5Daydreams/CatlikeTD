@@ -163,7 +163,7 @@ Light:
     m_CustomResolution: -1
     m_Strength: 1
     m_Bias: 0.05
-    m_NormalBias: 0.4
+    m_NormalBias: 0
     m_NearPlane: 0.2
     m_CullingMatrixOverride:
       e00: 1
@@ -275,7 +275,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 30
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -288,7 +288,7 @@ Camera:
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
-  m_AllowMSAA: 1
+  m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
@@ -302,13 +302,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.38268343, y: 0, z: 0, w: 0.92387956}
-  m_LocalPosition: {x: 0, y: 5.91, z: -7.33}
+  m_LocalRotation: {x: 0.4383711, y: 0, z: 0, w: 0.89879405}
+  m_LocalPosition: {x: 0, y: 6, z: -6.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 52, y: 0, z: 0}
 --- !u!114 &1050898702 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2993374898744496193, guid: 5b054dd0ee2ba5f429605a562db55c9b, type: 3}
@@ -349,8 +349,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bd1e3f16eda2164a985ad38418416db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boardSize: {x: 11, y: 11}
+  tileContentFactory: {fileID: 11400000, guid: 7aa3d8a4c403d904dbde5f2ad726eb81, type: 2}
   board: {fileID: 1050898702}
+  boardSize: {x: 11, y: 11}
 --- !u!4 &2033925445
 Transform:
   m_ObjectHideFlags: 0

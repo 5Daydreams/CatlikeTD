@@ -6,11 +6,33 @@ public class GameTile : MonoBehaviour
 {
     [SerializeField] Transform arrow = default;
 
-    GameTile north, east, south, west, nextOnPath;
+    public bool IsAlternative { get; set; }
+    public bool HasPath => distance != int.MaxValue;
+
+    static Quaternion
+        northRotation = Quaternion.Euler(90f, 0f, 0f),
+        eastRotation = Quaternion.Euler(90f, 90f, 0f),
+        southRotation = Quaternion.Euler(90f, 180f, 0f),
+        westRotation = Quaternion.Euler(90f, 270f, 0f);
 
     int distance;
+    GameTileContent content;
+    public GameTileContent Content
+    {
+        get => content;
+        set
+        {
+            Debug.Assert(value != null, "Null assigned to content!");
+            if (content != null)
+            {
+                content.Recycle();
+            }
+            content = value;
+            content.transform.localPosition = transform.localPosition;
+        }
+    }
 
-    public bool HasPath => distance != int.MaxValue;
+    GameTile north, east, south, west, nextOnPath;
 
     GameTile GrowPathTo(GameTile neighbor)
     {
@@ -20,7 +42,16 @@ public class GameTile : MonoBehaviour
         }
         neighbor.distance = distance + 1;
         neighbor.nextOnPath = this;
-        return neighbor;
+
+        if (neighbor.Content.Type == GameTileContentType.Wall)
+        {
+            return null;
+        }
+        else
+        {
+            return neighbor;
+        }
+        //return neighbor;
     }
 
     public GameTile GrowPathNorth() => GrowPathTo(north);
@@ -30,6 +61,29 @@ public class GameTile : MonoBehaviour
     public GameTile GrowPathSouth() => GrowPathTo(south);
 
     public GameTile GrowPathWest() => GrowPathTo(west);
+
+    public void ShowPathArrow()
+    {
+        if (distance == 0) // destination tiles need no arrows
+        {
+            arrow.gameObject.SetActive(false);
+            return;
+        }
+
+        arrow.gameObject.SetActive(true);
+
+        // adjust arrow direction/rotation
+        arrow.localRotation =
+            nextOnPath == north ? northRotation :
+            nextOnPath == east ? eastRotation :
+            nextOnPath == south ? southRotation :
+            westRotation;
+    }
+
+    public void HidePath()
+    {
+        arrow.gameObject.SetActive(false);
+    }
 
     public void ClearPath()
     {
@@ -59,4 +113,7 @@ public class GameTile : MonoBehaviour
         south.north = north;
         north.south = south;
     }
+
+
+
 }
