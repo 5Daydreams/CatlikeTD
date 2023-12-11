@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class GameTile : MonoBehaviour
 {
     [SerializeField] Transform arrow = default;
     public bool IsAlternative { get; set; }
     public bool HasPath => distance != int.MaxValue;
+    public Direction PathDirection { get; private set; }
+    public Vector3 ExitPoint { get; private set; }
 
     static Quaternion
         northRotation = Quaternion.Euler(90f, 0f, 0f),
@@ -37,7 +38,7 @@ public class GameTile : MonoBehaviour
     public GameTile NextTileOnPath => nextOnPath;
 
 
-    GameTile GrowPathTo(GameTile neighbor)
+    GameTile GrowPathTo(GameTile neighbor, Direction direction)
     {
         if (!HasPath || neighbor == null || neighbor.HasPath)
         {
@@ -45,6 +46,8 @@ public class GameTile : MonoBehaviour
         }
         neighbor.distance = distance + 1;
         neighbor.nextOnPath = this;
+        neighbor.PathDirection = direction;
+        neighbor.ExitPoint = neighbor.transform.localPosition + direction.GetHalfVector();
 
         if (neighbor.Content.Type == GameTileContentType.Wall)
         {
@@ -59,13 +62,10 @@ public class GameTile : MonoBehaviour
 
 
 
-    public GameTile GrowPathNorth() => GrowPathTo(north);
-
-    public GameTile GrowPathEast() => GrowPathTo(east);
-
-    public GameTile GrowPathSouth() => GrowPathTo(south);
-
-    public GameTile GrowPathWest() => GrowPathTo(west);
+    public GameTile GrowPathNorth() => GrowPathTo(north, Direction.South);
+    public GameTile GrowPathEast() => GrowPathTo(east, Direction.West);
+    public GameTile GrowPathSouth() => GrowPathTo(south, Direction.North);
+    public GameTile GrowPathWest() => GrowPathTo(west, Direction.East);
 
     public void ShowPathArrow()
     {
@@ -100,6 +100,7 @@ public class GameTile : MonoBehaviour
     {
         distance = 0;
         nextOnPath = null;
+        ExitPoint = transform.localPosition;
     }
 
     public static void MakeEastWestNeighbors(GameTile east, GameTile west)
