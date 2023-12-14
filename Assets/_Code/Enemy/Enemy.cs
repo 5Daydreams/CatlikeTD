@@ -8,11 +8,12 @@ public class Enemy : MonoBehaviour
 
     GameTile tileFrom, tileTo;
     Vector3 positionFrom, positionTo;
-    float progress;
+    float progress = 0.0f, progressFactor = 1.0f, speed;
 
     Direction direction;
     DirectionChange directionChange;
     float directionAngleFrom, directionAngleTo;
+    float pathOffset;
 
     public EnemyFactory OriginFactory
     {
@@ -33,19 +34,24 @@ public class Enemy : MonoBehaviour
         progress = 0f;
     }
 
-    void PrepareIntro()
+    public void Initialize(float scale, float speed, float pathOffset)
     {
-        positionFrom = tileFrom.transform.localPosition;
-        positionTo = tileFrom.ExitPoint;
-        direction = tileFrom.PathDirection;
-        directionChange = DirectionChange.None;
-        directionAngleFrom = directionAngleTo = direction.GetAngle();
-        transform.localRotation = direction.GetRotation();
+        model.localScale = new Vector3(scale, scale, scale);
+        this.speed = speed;
+        this.pathOffset = pathOffset;
     }
 
     void PrepareNextState()
     {
+        tileFrom = tileTo;
+        tileTo = tileTo.NextTileOnPath;
         positionFrom = positionTo;
+        if (tileTo == null)
+        {
+            PrepareOutro();
+            return;
+        }
+
         positionTo = tileFrom.ExitPoint;
         directionChange = direction.GetDirectionChangeTo(tileFrom.PathDirection);
         direction = tileFrom.PathDirection;
@@ -67,50 +73,75 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    void PrepareIntro()
+    {
+        progressFactor = 2f * speed;
+        positionFrom = tileFrom.transform.localPosition;
+        positionTo = tileFrom.ExitPoint;
+        direction = tileFrom.PathDirection;
+        directionChange = DirectionChange.None;
+        directionAngleFrom = directionAngleTo = direction.GetAngle();
+        model.localPosition = new Vector3(pathOffset, 0f);
+        transform.localRotation = direction.GetRotation();
+    }
+
     void PrepareForward()
     {
+        progressFactor = speed;
         transform.localRotation = direction.GetRotation();
         directionAngleTo = direction.GetAngle();
-        model.localPosition = Vector3.zero;
+        model.localPosition = new Vector3(pathOffset, 0f);
     }
 
     void PrepareTurnRight()
     {
+        progressFactor = speed / (Mathf.PI * 0.5f * (0.5f - pathOffset));
         directionAngleTo = directionAngleFrom + 90f;
-        model.localPosition = new Vector3(-0.5f, 0f);
+        model.localPosition = new Vector3(pathOffset - 0.5f, 0f);
         transform.localPosition = positionFrom + direction.GetHalfVector();
     }
 
     void PrepareTurnLeft()
     {
+        progressFactor = speed / (Mathf.PI * 0.5f * (0.5f + pathOffset));
         directionAngleTo = directionAngleFrom - 90f;
-        model.localPosition = new Vector3(0.5f, 0f);
+        model.localPosition = new Vector3(pathOffset + 0.5f, 0f);
         transform.localPosition = positionFrom + direction.GetHalfVector();
     }
 
     void PrepareTurnAround()
     {
-        directionAngleTo = directionAngleFrom + 180f;
-        model.localPosition = Vector3.zero;
+        float angleByOffset = (pathOffset < 0f ? 180f : -180f);
+        directionAngleTo = directionAngleFrom + angleByOffset;
+        model.localPosition = new Vector3(pathOffset, 0f);
         transform.localPosition = positionFrom;
+        progressFactor = speed / (Mathf.PI * Mathf.Max(Mathf.Abs(pathOffset), 0.1f));
+    }
+
+    void PrepareOutro()
+    {
+        positionTo = tileFrom.transform.localPosition;
+        directionChange = DirectionChange.None;
+        directionAngleTo = direction.GetAngle();
+        model.localPosition = new Vector3(pathOffset, 0f);
+        transform.localRotation = direction.GetRotation();
+        progressFactor = 2f * speed;
     }
 
     public bool GameUpdate()
     {
-        progress += Time.deltaTime;
+        progress += Time.deltaTime * progressFactor;
         while (progress >= 1f)
         {
-            tileFrom = tileTo;
-            tileTo = tileTo.NextTileOnPath;
-
             if (tileTo == null) // to stop if the destination is found
             {
                 OriginFactory.Reclaim(this);
                 return false;
             }
 
+            progress = (progress - 1f) / progressFactor;
             PrepareNextState();
-            progress -= 1f;
+            progress *= progressFactor;
         }
 
         if (directionChange == DirectionChange.None)
