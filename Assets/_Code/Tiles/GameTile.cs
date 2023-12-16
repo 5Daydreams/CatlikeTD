@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 public class GameTile : MonoBehaviour
 {
-    [SerializeField] Transform arrow = default;
+    [SerializeField] private Transform arrow = default;
     public bool IsAlternative { get; set; }
     public bool HasPath => distance != int.MaxValue;
     public Direction PathDirection { get; private set; }
     public Vector3 ExitPoint { get; private set; }
 
-    static Quaternion
+    private static Quaternion
         northRotation = Quaternion.Euler(90f, 0f, 0f),
         eastRotation = Quaternion.Euler(90f, 90f, 0f),
         southRotation = Quaternion.Euler(90f, 180f, 0f),
         westRotation = Quaternion.Euler(90f, 270f, 0f);
 
-    int distance;
-    GameTileContent content;
+    private int distance;
+    private GameTileContent content;
 
 
     public GameTileContent Content
@@ -49,7 +49,7 @@ public class GameTile : MonoBehaviour
         neighbor.PathDirection = direction;
         neighbor.ExitPoint = neighbor.transform.localPosition + direction.GetHalfVector();
 
-        if (neighbor.Content.Type == GameTileContentType.Wall)
+        if (neighbor.Content.BlocksPath)
         {
             return null;
         }

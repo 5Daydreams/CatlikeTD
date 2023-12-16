@@ -4,10 +4,11 @@ using UnityEngine;
 public class GameTileContentFactory : GameObjectFactory
 {
 
-    [SerializeField] GameTileContent destinationPrefab = default;
-    [SerializeField] GameTileContent emptyPrefab = default;
-    [SerializeField] GameTileContent wallPrefab = default;
-    [SerializeField] GameTileContent spawnPrefab = default;
+    [SerializeField] private GameTileContent destinationPrefab = default;
+    [SerializeField] private GameTileContent emptyPrefab = default;
+    [SerializeField] private GameTileContent wallPrefab = default;
+    [SerializeField] private GameTileContent spawnPrefab = default;
+    [SerializeField] private Tower towerPrefab = default;
 
     public void Reclaim(GameTileContent content)
     {
@@ -30,6 +31,7 @@ public class GameTileContentFactory : GameObjectFactory
             case GameTileContentType.Empty: return Get(emptyPrefab);
             case GameTileContentType.Wall: return Get(wallPrefab);
             case GameTileContentType.SpawnPoint: return Get(spawnPrefab);
+            case GameTileContentType.Tower: return Get(towerPrefab);
         }
         Debug.Assert(false, "Unsupported type: " + type);
         return null;

@@ -3,7 +3,7 @@
 [System.Serializable]
 public class EnemyCollection
 {
-    List<Enemy> enemies = new List<Enemy>();
+    private List<Enemy> enemies = new List<Enemy>();
 
     public void Add(Enemy enemy)
     {

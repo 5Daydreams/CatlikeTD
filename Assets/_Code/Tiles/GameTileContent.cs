@@ -3,16 +3,17 @@
 
 public enum GameTileContentType
 {
-    Empty, Destination, Wall, SpawnPoint
+    Empty, Destination, Wall, SpawnPoint, Tower
 }
 
+[SelectionBase]
 public class GameTileContent : MonoBehaviour
 {
-    [SerializeField] GameTileContentType type = default;
-
+    [SerializeField] private GameTileContentType type = default;
     public GameTileContentType Type => type;
+    public bool BlocksPath => Type == GameTileContentType.Wall || Type == GameTileContentType.Tower;
 
-    GameTileContentFactory originFactory;
+    private GameTileContentFactory originFactory;
 
     public GameTileContentFactory OriginFactory
     {
@@ -23,6 +24,8 @@ public class GameTileContent : MonoBehaviour
             originFactory = value;
         }
     }
+
+    public virtual void GameUpdate() { }
 
     public void Recycle()
     {

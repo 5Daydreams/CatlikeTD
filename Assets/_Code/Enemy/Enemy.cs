@@ -2,18 +2,21 @@
 
 public class Enemy : MonoBehaviour
 {
-    [SerializeField] Transform model = default;
+    [SerializeField] private Transform model = default;
+    public float Scale { get; private set; }
 
-    EnemyFactory originFactory;
+    private EnemyFactory originFactory;
 
-    GameTile tileFrom, tileTo;
-    Vector3 positionFrom, positionTo;
-    float progress = 0.0f, progressFactor = 1.0f, speed;
+    private GameTile tileFrom, tileTo;
+    private Vector3 positionFrom, positionTo;
+    private float progress = 0.0f, progressFactor = 1.0f, speed;
 
-    Direction direction;
-    DirectionChange directionChange;
-    float directionAngleFrom, directionAngleTo;
-    float pathOffset;
+    private Direction direction;
+    private DirectionChange directionChange;
+    private float directionAngleFrom, directionAngleTo;
+    private float pathOffset;
+    private float Health { get; set; }
+
 
     public EnemyFactory OriginFactory
     {
@@ -37,7 +40,9 @@ public class Enemy : MonoBehaviour
     public void Initialize(float scale, float speed, float pathOffset)
     {
         model.localScale = new Vector3(scale, scale, scale);
-        this.speed = speed;
+        Scale = scale;
+        Health = 100f * scale;
+        this.speed = speed / Mathf.Max(1.0f, scale);
         this.pathOffset = pathOffset;
     }
 
@@ -130,6 +135,12 @@ public class Enemy : MonoBehaviour
 
     public bool GameUpdate()
     {
+        if (Health <= 0f)
+        {
+            OriginFactory.Reclaim(this);
+            return false;
+        }
+
         progress += Time.deltaTime * progressFactor;
         while (progress >= 1f)
         {
@@ -157,5 +168,11 @@ public class Enemy : MonoBehaviour
             transform.localRotation = Quaternion.Euler(0f, angle, 0f);
         }
         return true;
+    }
+
+    public void ApplyDamage(float damage)
+    {
+        Debug.Assert(damage >= 0f, "Negative damage applied.");
+        Health -= damage;
     }
 }

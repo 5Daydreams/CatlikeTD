@@ -5,19 +5,20 @@ using UnityEngine;
 public class GameBoard : MonoBehaviour
 {
 
-    [SerializeField] Transform ground = default;
-    [SerializeField] GameTile tilePrefab = default;
-    [SerializeField] Texture2D gridTexture = default;
-
-    Vector2Int size;
-    bool showGrid, showPaths;
-
-    GameTile[] tiles;
-    Queue<GameTile> searchFrontier = new Queue<GameTile>();
-    List<GameTile> spawnPoints = new List<GameTile>();
+    [SerializeField] private Transform ground = default;
+    [SerializeField] private GameTile tilePrefab = default;
+    [SerializeField] private Texture2D gridTexture = default;
     public int SpawnPointCount => spawnPoints.Count;
 
-    GameTileContentFactory contentFactory;
+    private Vector2Int size;
+    private bool showGrid, showPaths;
+
+    private GameTile[] tiles;
+    private Queue<GameTile> searchFrontier = new Queue<GameTile>();
+    private List<GameTile> spawnPoints = new List<GameTile>();
+
+    private GameTileContentFactory contentFactory;
+    private List<GameTileContent> updatingContent = new List<GameTileContent>();
 
     public void Initialize(Vector2Int size, GameTileContentFactory contentFactory)
     {
@@ -184,7 +185,7 @@ public class GameBoard : MonoBehaviour
 
     public GameTile GetTile(Ray ray)
     {
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        if (Physics.Raycast(ray, out RaycastHit hit, float.MaxValue, 1))
         {
             // this only really works because of centering the board and having tile sizes be (1,1,1)
             int x = (int)(hit.point.x + size.x * 0.5f);
@@ -254,6 +255,42 @@ public class GameBoard : MonoBehaviour
         {
             tile.Content = contentFactory.Get(GameTileContentType.SpawnPoint);
             spawnPoints.Add(tile);
+        }
+    }
+
+    public void ToggleTower(GameTile tile)
+    {
+        if (tile.Content.Type == GameTileContentType.Tower)
+        {
+            updatingContent.Remove(tile.Content);
+            tile.Content = contentFactory.Get(GameTileContentType.Empty);
+            FindPaths();
+        }
+        else if (tile.Content.Type == GameTileContentType.Empty)
+        {
+            tile.Content = contentFactory.Get(GameTileContentType.Tower);
+            if (FindPaths())
+            {
+                updatingContent.Add(tile.Content);
+            }
+            else
+            {
+                tile.Content = contentFactory.Get(GameTileContentType.Empty);
+                FindPaths();
+            }
+        }
+        else if (tile.Content.Type == GameTileContentType.Wall)
+        {
+            tile.Content = contentFactory.Get(GameTileContentType.Tower);
+            updatingContent.Add(tile.Content);
+        }
+    }
+
+    public void GameUpdate()
+    {
+        for (int i = 0; i < updatingContent.Count; i++)
+        {
+            updatingContent[i].GameUpdate();
         }
     }
 }

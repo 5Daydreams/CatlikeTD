@@ -4,18 +4,18 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
-    [SerializeField] GameTileContentFactory tileContentFactory = default;
+    [SerializeField] private GameTileContentFactory tileContentFactory = default;
 
-    [SerializeField] GameBoard board = default;
-    [SerializeField] Vector2Int boardSize = new Vector2Int(11, 11);
+    [SerializeField] private GameBoard board = default;
+    [SerializeField] private Vector2Int boardSize = new Vector2Int(11, 11);
 
-    [SerializeField] EnemyFactory enemyFactory = default;
-    [SerializeField, Range(0.1f, 10f)] float spawnSpeed = 1f;
+    [SerializeField] private EnemyFactory enemyFactory = default;
+    [SerializeField, Range(0.1f, 10f)] private float spawnSpeed = 1f;
 
-    float spawnProgress = 0.0f;
+    private float spawnProgress = 0.0f;
 
-    EnemyCollection enemies = new EnemyCollection();
-    Ray TouchRay => Camera.main.ScreenPointToRay(Input.mousePosition);
+    private EnemyCollection enemies = new EnemyCollection();
+    private Ray TouchRay => Camera.main.ScreenPointToRay(Input.mousePosition);
 
     void Awake()
     {
@@ -64,6 +64,8 @@ public class Game : MonoBehaviour
         }
 
         enemies.GameUpdate();
+        Physics.SyncTransforms();
+        board.GameUpdate();
     }
 
     void SpawnEnemy()
@@ -80,9 +82,18 @@ public class Game : MonoBehaviour
         GameTile tile = board.GetTile(TouchRay);
         if (tile != null)
         {
-            board.ToggleWall(tile);
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                board.ToggleTower(tile);
+            }
+            else
+            {
+                board.ToggleWall(tile);
+            }
         }
     }
+
+
 
     void HandleAlternativeTouch()
     {
