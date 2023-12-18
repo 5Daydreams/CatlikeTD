@@ -9,7 +9,10 @@ public abstract class Tower : GameTileContent
 
     protected bool AcquireTarget(out TargetPoint target)
     {
-        int hits = Physics.OverlapCapsuleNonAlloc(transform.localPosition, transform.localPosition + Vector3.up * 2.0f, targettingRange, targetsBuffer, enemyLayerMask);
+        Vector3 a = transform.localPosition;
+        Vector3 b = a;
+        b.y += 3f;
+        int hits = Physics.OverlapCapsuleNonAlloc(a, b, targettingRange, targetsBuffer, enemyLayerMask);
         if (hits > 0)
         {
             target = targetsBuffer[Random.Range(0, hits)].GetComponent<TargetPoint>();

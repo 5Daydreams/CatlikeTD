@@ -38,6 +38,11 @@ public class GameBoard : MonoBehaviour
                 tiles[i] = t;
                 GameTile tile = t;
 
+                tile.Content = contentFactory.Get(GameTileContentType.Empty);
+                tile.transform.SetParent(transform, false);
+                tile.transform.localPosition =
+                    new Vector3(x - offset.x, 0f, y - offset.y);
+
                 if (x > 0)
                 {
                     GameTile.MakeEastWestNeighbors(tile, tiles[i - 1]);
@@ -47,10 +52,6 @@ public class GameBoard : MonoBehaviour
                     GameTile.MakeNorthSouthNeighbors(tile, tiles[i - size.x]);
                 }
 
-                tile.Content = contentFactory.Get(GameTileContentType.Empty);
-                tile.transform.SetParent(transform, false);
-                tile.transform.localPosition =
-                    new Vector3(x - offset.x, 0f, y - offset.y);
 
                 tile.IsAlternative = (i % 2) == 0;
                 // tile.IsAlternative = (i & 1) == 0; // funny - this one also works!
