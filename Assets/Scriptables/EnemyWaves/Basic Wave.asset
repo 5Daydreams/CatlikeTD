@@ -16,7 +16,7 @@ MonoBehaviour:
   - factory: {fileID: 11400000, guid: e53c33a1becdc2f41a133416d51bf32c, type: 2}
     type: 2
     amount: 1
-    cooldown: 10
+    cooldown: 5
   - factory: {fileID: 11400000, guid: e53c33a1becdc2f41a133416d51bf32c, type: 2}
     type: 1
     amount: 10
