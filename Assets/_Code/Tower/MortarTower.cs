@@ -8,9 +8,15 @@ public class MortarTower : Tower
 
     public override TowerType TowerType => TowerType.Mortar;
 
+    [SerializeField, Range(0.5f, 3f)] float shellBlastRadius = 1f;
+
+    [SerializeField, Range(1f, 100f)] float shellDamage = 10f;
+
+
     private float launchSpeed;
     private float launchProgress;
 
+    private const float g = 9.81f;
 
     private void Awake()
     {
@@ -40,7 +46,6 @@ public class MortarTower : Tower
             {
                 launchProgress = 0.9999f;
             }
-
         }
     }
 
@@ -58,7 +63,6 @@ public class MortarTower : Tower
         float y = -launchPoint.y;
         direction /= x; // now direction is normalized
 
-        float g = 9.81f;
         float s = launchSpeed;
         float s2 = s * s;
 
@@ -67,7 +71,9 @@ public class MortarTower : Tower
         Debug.Assert(r >= 0f, "Launch velocity insufficient for range!");
 
         float tanO = (s2 + Mathf.Sqrt(r)) / (g * x);
-        float cosO = Mathf.Cos(Mathf.Atan(tanO));
+        float theta = Mathf.Atan(tanO);
+
+        float cosO = Mathf.Cos(theta);
         float sinO = cosO * tanO;
 
         mortar.localRotation = Quaternion.LookRotation(new Vector3(direction.x, tanO, direction.y));
@@ -75,18 +81,41 @@ public class MortarTower : Tower
         Game.SpawnShell().Initialize(
             launchPoint,
             targetPoint,
-            new Vector3(s * cosO * direction.x, s * sinO, s * cosO * direction.y)
+            new Vector3(s * cosO * direction.x, s * sinO, s * cosO * direction.y),
+            shellBlastRadius,
+            shellDamage
         );
 
-        // I'm not a fan of this approach. If a for-loop is required, the differential form is more explicit
+        // // Disabled Preview
+        //DrawLinePreview(targetPoint, direction, launchSpeed, theta);
+    }
+
+    private void DrawLinePreview(
+        Vector3 targetPoint,
+        Vector3 launchDirection,
+        float launchSpeed,
+        float angleTheta
+    )
+    {
+        Vector3 launchPoint = mortar.position;
         Vector3 prev = launchPoint;
         Vector3 next;
+
+        Vector2 direction;
+        direction.x = targetPoint.x - launchPoint.x;
+        direction.y = targetPoint.z - launchPoint.z;
+
+        float flatProjectedLaunchSpeed = direction.magnitude;
+
+        float cosO = Mathf.Cos(angleTheta);
+        float sinO = Mathf.Sin(angleTheta);
+
         for (int i = 1; i <= 10; i++)
         {
             float t = i / 10f;
-            float dx = s * cosO * t; // dx means "vx"
-            float dy = s * sinO * t - 0.5f * g * t * t; // dy means "vy"
-            next = launchPoint + new Vector3(direction.x * dx, dy, direction.y * dx);
+            float dx = launchSpeed * cosO * t; // dx means "vx"
+            float dy = launchSpeed * sinO * t - 0.5f * g * t * t; // dy means "vy"
+            next = launchPoint + new Vector3(launchDirection.x * dx, dy, launchDirection.y * dx);
             Debug.DrawLine(prev, next, Color.blue, 1.0f);
             prev = next;
         }
@@ -94,7 +123,14 @@ public class MortarTower : Tower
         Debug.DrawLine(launchPoint, targetPoint, Color.yellow, 1.0f);
         Debug.DrawLine(
             new Vector3(launchPoint.x, 0.01f, launchPoint.z),
-            new Vector3(launchPoint.x + direction.x * x, 0.01f, launchPoint.z + direction.y * x),
-            Color.white, 1.0f);
+            new Vector3(
+                launchPoint.x + launchDirection.x * flatProjectedLaunchSpeed,
+                0.01f,
+                launchPoint.z + launchDirection.y * flatProjectedLaunchSpeed
+            ),
+            Color.white, 1.0f
+        );
     }
+
+
 }

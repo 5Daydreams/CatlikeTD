@@ -4,7 +4,9 @@ using UnityEngine;
 public class WarFactory : GameObjectFactory
 {
     [SerializeField] MortarShell shellPrefab = default;
+    [SerializeField] Explosion explosionPrefab = default;
 
+    public Explosion Explosion => Get(explosionPrefab);
     public MortarShell Shell => Get(shellPrefab);
 
     private T Get<T>(T prefab) where T : WarEntity
