@@ -2,6 +2,8 @@
 
 public class LaserTower : Tower
 {
+    public override TowerType TowerType => TowerType.Laser;
+
     [SerializeField] private Transform turret = default, laserBeam = default;
     [SerializeField, Range(1f, 100f)] private float damagePerSecond = 10f;
 

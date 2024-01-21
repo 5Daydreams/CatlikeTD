@@ -259,17 +259,26 @@ public class GameBoard : MonoBehaviour
         }
     }
 
-    public void ToggleTower(GameTile tile)
+    public void ToggleTower(GameTile tile, TowerType towerType)
     {
         if (tile.Content.Type == GameTileContentType.Tower)
         {
             updatingContent.Remove(tile.Content);
-            tile.Content = contentFactory.Get(GameTileContentType.Empty);
-            FindPaths();
+            if (((Tower)tile.Content).TowerType == towerType)
+            {
+                tile.Content = contentFactory.Get(GameTileContentType.Empty);
+                FindPaths();
+            }
+            else
+            {
+                tile.Content = contentFactory.Get(towerType);
+                updatingContent.Add(tile.Content);
+            }
+
         }
         else if (tile.Content.Type == GameTileContentType.Empty)
         {
-            tile.Content = contentFactory.Get(GameTileContentType.Tower);
+            tile.Content = contentFactory.Get(towerType);
             if (FindPaths())
             {
                 updatingContent.Add(tile.Content);
@@ -282,11 +291,12 @@ public class GameBoard : MonoBehaviour
         }
         else if (tile.Content.Type == GameTileContentType.Wall)
         {
-            tile.Content = contentFactory.Get(GameTileContentType.Tower);
+            tile.Content = contentFactory.Get(towerType);
             updatingContent.Add(tile.Content);
         }
     }
 
+    // Abstracting out Unity's Upadte() method to have direct control via our own Game class
     public void GameUpdate()
     {
         for (int i = 0; i < updatingContent.Count; i++)

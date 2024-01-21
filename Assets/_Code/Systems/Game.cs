@@ -12,10 +12,31 @@ public class Game : MonoBehaviour
     [SerializeField] private EnemyFactory enemyFactory = default;
     [SerializeField, Range(0.1f, 10f)] private float spawnSpeed = 1f;
 
+    [SerializeField] private WarFactory warFactory = default;
+
     private float spawnProgress = 0.0f;
 
-    private EnemyCollection enemies = new EnemyCollection();
+    GameBehaviorCollection enemies = new GameBehaviorCollection();
+    GameBehaviorCollection nonEnemies = new GameBehaviorCollection();
+
     private Ray TouchRay => Camera.main.ScreenPointToRay(Input.mousePosition);
+    private TowerType selectedTowerType;
+
+
+    static Game instance;
+
+    public static MortarShell SpawnShell()
+    {
+        MortarShell shell = instance.warFactory.Shell;
+        instance.nonEnemies.Add(shell);
+        return shell;
+    }
+
+    void OnEnable()
+    {
+        instance = this;
+    }
+
 
     void Awake()
     {
@@ -56,6 +77,15 @@ public class Game : MonoBehaviour
             board.ShowGrid = !board.ShowGrid;
         }
 
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            selectedTowerType = TowerType.Laser;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            selectedTowerType = TowerType.Mortar;
+        }
+
         spawnProgress += spawnSpeed * Time.deltaTime;
         while (spawnProgress >= 1f)
         {
@@ -66,6 +96,7 @@ public class Game : MonoBehaviour
         enemies.GameUpdate();
         Physics.SyncTransforms();
         board.GameUpdate();
+        nonEnemies.GameUpdate(); // to be updated last
     }
 
     void SpawnEnemy()
@@ -84,7 +115,7 @@ public class Game : MonoBehaviour
         {
             if (Input.GetKey(KeyCode.LeftShift))
             {
-                board.ToggleTower(tile);
+                board.ToggleTower(tile, selectedTowerType);
             }
             else
             {

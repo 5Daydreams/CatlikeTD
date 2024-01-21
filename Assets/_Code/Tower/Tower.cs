@@ -1,11 +1,18 @@
 ﻿using UnityEngine;
 
+public enum TowerType
+{
+    Laser, Mortar,
+}
+
 public abstract class Tower : GameTileContent
 {
+    public abstract TowerType TowerType { get; }
+
     [SerializeField, Range(1.5f, 10.5f)] protected float targettingRange = 1.5f;
 
     private static Collider[] targetsBuffer = new Collider[100];
-    private const int enemyLayerMask = 1 << 9; // equivalte to 2^9 (because 1 == 2^0)
+    private const int enemyLayerMask = 1 << 9; // equivalent to 2^9 (because 1 == 2^0)
 
     protected bool AcquireTarget(out TargetPoint target)
     {
