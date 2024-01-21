@@ -93,6 +93,12 @@ public class Game : MonoBehaviour
             selectedTowerType = TowerType.Mortar;
         }
 
+
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            BeginNewGame();
+        }
+
         activeScenario.Progress();
         enemies.GameUpdate();
         Physics.SyncTransforms();
@@ -108,6 +114,14 @@ public class Game : MonoBehaviour
         Enemy enemy = factory.Get(type);
         enemy.SpawnOn(spawnPoint);
         instance.enemies.Add(enemy);
+    }
+
+    void BeginNewGame()
+    {
+        enemies.Clear();
+        nonEnemies.Clear();
+        board.Clear();
+        activeScenario = scenario.Begin();
     }
 
     void HandleTouch() // currently turns target tiles into destination tiles

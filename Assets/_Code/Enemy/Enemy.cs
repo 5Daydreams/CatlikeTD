@@ -143,7 +143,7 @@ public class Enemy : GameBehavior
     {
         if (Health <= 0f)
         {
-            OriginFactory.Reclaim(this);
+            Recycle();
             return false;
         }
 
@@ -152,7 +152,7 @@ public class Enemy : GameBehavior
         {
             if (tileTo == null) // to stop if the destination is found
             {
-                OriginFactory.Reclaim(this);
+                Recycle();
                 return false;
             }
 
@@ -180,5 +180,10 @@ public class Enemy : GameBehavior
     {
         Debug.Assert(damage >= 0f, "Negative damage applied.");
         Health -= damage;
+    }
+
+    public override void Recycle()
+    {
+        OriginFactory.Reclaim(this);
     }
 }

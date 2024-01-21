@@ -38,7 +38,6 @@ public class GameBoard : MonoBehaviour
                 tiles[i] = t;
                 GameTile tile = t;
 
-                tile.Content = contentFactory.Get(GameTileContentType.Empty);
                 tile.transform.SetParent(transform, false);
                 tile.transform.localPosition =
                     new Vector3(x - offset.x, 0f, y - offset.y);
@@ -61,6 +60,19 @@ public class GameBoard : MonoBehaviour
             // remember - the i++ happens one more time than it should, since it's AFTER the for(x) logic, therefore there is no need to i++ at the start or end of for(y)
         }
 
+        ToggleDestination(tiles[tiles.Length / 2]);
+        ToggleSpawnPoint(tiles[0]);
+        Clear();
+    }
+
+    public void Clear()
+    {
+        foreach (GameTile tile in tiles)
+        {
+            tile.Content = contentFactory.Get(GameTileContentType.Empty);
+        }
+        spawnPoints.Clear();
+        updatingContent.Clear();
         ToggleDestination(tiles[tiles.Length / 2]);
         ToggleSpawnPoint(tiles[0]);
     }

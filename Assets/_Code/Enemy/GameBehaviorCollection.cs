@@ -10,6 +10,15 @@ public class GameBehaviorCollection
         behaviours.Add(behaviour);
     }
 
+    public void Clear()
+    {
+        for (int i = 0; i < behaviours.Count; i++)
+        {
+            behaviours[i].Recycle();
+        }
+        behaviours.Clear();
+    }
+
     public void GameUpdate()
     {
         for (int i = 0; i < behaviours.Count; i++)
