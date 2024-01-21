@@ -9,12 +9,7 @@ public class Game : MonoBehaviour
     [SerializeField] private GameBoard board = default;
     [SerializeField] private Vector2Int boardSize = new Vector2Int(11, 11);
 
-    [SerializeField] private EnemyFactory enemyFactory = default;
-    [SerializeField, Range(0.1f, 10f)] private float spawnSpeed = 1f;
-
     [SerializeField] private WarFactory warFactory = default;
-
-    private float spawnProgress = 0.0f;
 
     GameBehaviorCollection enemies = new GameBehaviorCollection();
     GameBehaviorCollection nonEnemies = new GameBehaviorCollection();
@@ -22,6 +17,10 @@ public class Game : MonoBehaviour
     private Ray TouchRay => Camera.main.ScreenPointToRay(Input.mousePosition);
     private TowerType selectedTowerType;
 
+    [SerializeField]
+    GameScenario scenario = default;
+
+    GameScenario.State activeScenario;
 
     static Game instance;
 
@@ -49,6 +48,7 @@ public class Game : MonoBehaviour
     {
         board.Initialize(boardSize, tileContentFactory);
         board.ShowGrid = true;
+        activeScenario = scenario.Begin();
     }
 
     void OnValidate()
@@ -93,26 +93,21 @@ public class Game : MonoBehaviour
             selectedTowerType = TowerType.Mortar;
         }
 
-        spawnProgress += spawnSpeed * Time.deltaTime;
-        while (spawnProgress >= 1f)
-        {
-            spawnProgress -= 1f;
-            SpawnEnemy();
-        }
-
+        activeScenario.Progress();
         enemies.GameUpdate();
         Physics.SyncTransforms();
         board.GameUpdate();
         nonEnemies.GameUpdate(); // to be updated last
     }
 
-    void SpawnEnemy()
+    public static void SpawnEnemy(EnemyFactory factory, EnemyType type)
     {
-        GameTile spawnPoint =
-            board.GetSpawnPoint(Random.Range(0, board.SpawnPointCount));
-        Enemy enemy = enemyFactory.Get();
+        GameTile spawnPoint = instance.board.GetSpawnPoint(
+            Random.Range(0, instance.board.SpawnPointCount)
+        );
+        Enemy enemy = factory.Get(type);
         enemy.SpawnOn(spawnPoint);
-        enemies.Add(enemy);
+        instance.enemies.Add(enemy);
     }
 
     void HandleTouch() // currently turns target tiles into destination tiles

@@ -352,9 +352,8 @@ MonoBehaviour:
   tileContentFactory: {fileID: 11400000, guid: 7aa3d8a4c403d904dbde5f2ad726eb81, type: 2}
   board: {fileID: 1050898702}
   boardSize: {x: 11, y: 11}
-  enemyFactory: {fileID: 11400000, guid: e53c33a1becdc2f41a133416d51bf32c, type: 2}
-  spawnSpeed: 1
   warFactory: {fileID: 11400000, guid: 526b4a4c203740444b2beb1a2c95c17f, type: 2}
+  scenario: {fileID: 11400000, guid: 1b17beec33c8cd44496c349678240c50, type: 2}
 --- !u!4 &2033925445
 Transform:
   m_ObjectHideFlags: 0

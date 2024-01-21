@@ -1,5 +1,11 @@
 ﻿using UnityEngine;
 
+public enum EnemyType
+{
+    Small, Medium, Large
+}
+
+
 public class Enemy : GameBehavior
 {
     [SerializeField] private Transform model = default;
@@ -37,11 +43,11 @@ public class Enemy : GameBehavior
         progress = 0f;
     }
 
-    public void Initialize(float scale, float speed, float pathOffset)
+    public void Initialize(float scale, float speed, float pathOffset, float health)
     {
         model.localScale = new Vector3(scale, scale, scale);
         Scale = scale;
-        Health = 100f * scale;
+        Health = health;
         this.speed = speed / Mathf.Max(1.0f, scale);
         this.pathOffset = pathOffset;
     }
