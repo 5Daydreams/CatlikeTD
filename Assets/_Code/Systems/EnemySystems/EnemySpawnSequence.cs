@@ -28,7 +28,7 @@ class EnemySpawnSequence
                     return cooldown;
                 }
                 count += 1;
-                Game.SpawnEnemy(sequence.factory,sequence.type);
+                Game.SpawnEnemy(sequence.factory, sequence.type);
             }
             return -1f;
         }

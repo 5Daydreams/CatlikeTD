@@ -354,6 +354,7 @@ MonoBehaviour:
   boardSize: {x: 11, y: 11}
   warFactory: {fileID: 11400000, guid: 526b4a4c203740444b2beb1a2c95c17f, type: 2}
   scenario: {fileID: 11400000, guid: 1b17beec33c8cd44496c349678240c50, type: 2}
+  startingPlayerHealth: 10
 --- !u!4 &2033925445
 Transform:
   m_ObjectHideFlags: 0
@@ -432,5 +433,5 @@ SceneRoots:
   m_Roots:
   - {fileID: 963194228}
   - {fileID: 705507995}
-  - {fileID: 9175606658599480051}
   - {fileID: 2033925445}
+  - {fileID: 9175606658599480051}

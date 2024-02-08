@@ -17,8 +17,10 @@ public class Game : MonoBehaviour
     private Ray TouchRay => Camera.main.ScreenPointToRay(Input.mousePosition);
     private TowerType selectedTowerType;
 
-    [SerializeField]
-    GameScenario scenario = default;
+    [SerializeField] GameScenario scenario = default;
+    [SerializeField, Range(0, 100)] int startingPlayerHealth = 10;
+
+    int playerHealth;
 
     GameScenario.State activeScenario;
 
@@ -46,6 +48,8 @@ public class Game : MonoBehaviour
 
     void Awake()
     {
+        playerHealth = startingPlayerHealth;
+
         board.Initialize(boardSize, tileContentFactory);
         board.ShowGrid = true;
         activeScenario = scenario.Begin();
@@ -99,6 +103,20 @@ public class Game : MonoBehaviour
             BeginNewGame();
         }
 
+        // use 0 for immortality 
+        if (playerHealth <= 0 && startingPlayerHealth > 0)
+        {
+            Debug.Log("Defeat!");
+            BeginNewGame();
+        }
+
+        if (!activeScenario.Progress() && enemies.IsEmpty)
+        {
+            Debug.Log("Victory!");
+            BeginNewGame();
+            activeScenario.Progress();
+        }
+
         activeScenario.Progress();
         enemies.GameUpdate();
         Physics.SyncTransforms();
@@ -118,6 +136,8 @@ public class Game : MonoBehaviour
 
     void BeginNewGame()
     {
+        playerHealth = startingPlayerHealth;
+
         enemies.Clear();
         nonEnemies.Clear();
         board.Clear();
@@ -156,5 +176,10 @@ public class Game : MonoBehaviour
                 board.ToggleSpawnPoint(tile);
             }
         }
+    }
+
+    public static void EnemyReachedDestination()
+    {
+        instance.playerHealth -= 1;
     }
 }

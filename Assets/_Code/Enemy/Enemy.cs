@@ -152,6 +152,7 @@ public class Enemy : GameBehavior
         {
             if (tileTo == null) // to stop if the destination is found
             {
+                Game.EnemyReachedDestination();
                 Recycle();
                 return false;
             }

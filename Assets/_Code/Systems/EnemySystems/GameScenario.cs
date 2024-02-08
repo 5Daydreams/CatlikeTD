@@ -7,7 +7,6 @@ public class GameScenario : ScriptableObject
     [System.Serializable]
     public struct State
     {
-
         GameScenario scenario;
 
         int index;
