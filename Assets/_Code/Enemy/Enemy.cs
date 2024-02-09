@@ -9,6 +9,10 @@ public enum EnemyType
 public class Enemy : GameBehavior
 {
     [SerializeField] private Transform model = default;
+    [SerializeField] private EnemyAnimationConfig animationConfig = default;
+
+    EnemyAnimator animator;
+
     public float Scale { get; private set; }
 
     private EnemyFactory originFactory;
@@ -43,6 +47,14 @@ public class Enemy : GameBehavior
         progress = 0f;
     }
 
+    void Awake()
+    {
+        animator.Configure(
+            model.GetChild(0).gameObject.AddComponent<Animator>(),
+            animationConfig
+        );
+    }
+
     public void Initialize(float scale, float speed, float pathOffset, float health)
     {
         model.localScale = new Vector3(scale, scale, scale);
@@ -50,6 +62,7 @@ public class Enemy : GameBehavior
         Health = health;
         this.speed = speed / Mathf.Max(1.0f, scale);
         this.pathOffset = pathOffset;
+        animator.Play(speed / scale);
     }
 
     void PrepareNextState()
@@ -185,6 +198,7 @@ public class Enemy : GameBehavior
 
     public override void Recycle()
     {
+        animator.Stop();
         OriginFactory.Reclaim(this);
     }
 }

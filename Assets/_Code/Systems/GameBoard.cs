@@ -61,8 +61,6 @@ public class GameBoard : MonoBehaviour
             // remember - the i++ happens one more time than it should, since it's AFTER the for(x) logic, therefore there is no need to i++ at the start or end of for(y)
         }
 
-        Debug.Log("Tiles length = " + tiles.Length);
-
         ToggleDestination(tiles[tiles.Length / 2]);
         ToggleSpawnPoint(tiles[0]);
         Clear();

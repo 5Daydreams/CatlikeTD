@@ -19,7 +19,9 @@ public class Game : MonoBehaviour
 
     [SerializeField] GameScenario scenario = default;
     [SerializeField, Range(0, 100)] int startingPlayerHealth = 10;
+    [SerializeField, Range(1f, 10f)] float playSpeed = 1f;
 
+    const float pausedTimeScale = 0f;
     int playerHealth;
 
     GameScenario.State activeScenario;
@@ -97,6 +99,14 @@ public class Game : MonoBehaviour
             selectedTowerType = TowerType.Mortar;
         }
 
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Time.timeScale = Time.timeScale > pausedTimeScale ? pausedTimeScale : playSpeed;
+        }
+        else if (Time.timeScale > pausedTimeScale)
+        {
+            Time.timeScale = playSpeed;
+        }
 
         if (Input.GetKeyDown(KeyCode.B))
         {
