@@ -62,7 +62,7 @@ public class Enemy : GameBehavior
         Health = health;
         this.speed = speed / Mathf.Max(1.0f, scale);
         this.pathOffset = pathOffset;
-        animator.Play(speed / scale);
+        animator.PlayIntro();
     }
 
     void PrepareNextState()
@@ -101,6 +101,7 @@ public class Enemy : GameBehavior
     {
         progressFactor = 2f * speed;
         positionFrom = tileFrom.transform.localPosition;
+        transform.localPosition = positionFrom; // but why...?
         positionTo = tileFrom.ExitPoint;
         direction = tileFrom.PathDirection;
         directionChange = DirectionChange.None;
@@ -154,10 +155,30 @@ public class Enemy : GameBehavior
 
     public override bool GameUpdate()
     {
+        animator.GameUpdate();
+        if (animator.CurrentClip == EnemyAnimator.Clip.Spawn)
+        {
+            if (!animator.IsDone)
+            {
+                return true;
+            }
+            animator.PlayMove(speed / Scale);
+        }
+        // note that the usage here requires SETTING ENUMS IN THE CORRECT ORDER.
+        else if (animator.CurrentClip >= EnemyAnimator.Clip.ReachDestination)
+        {
+            if (animator.IsDone)
+            {
+                Recycle();
+                return false;
+            }
+            return true;
+        }
+
         if (Health <= 0f)
         {
-            Recycle();
-            return false;
+            animator.PlayDying();
+            return true;
         }
 
         progress += Time.deltaTime * progressFactor;
@@ -166,8 +187,9 @@ public class Enemy : GameBehavior
             if (tileTo == null) // to stop if the destination is found
             {
                 Game.EnemyReachedDestination();
-                Recycle();
-                return false;
+                //Recycle();
+                animator.PlayOutro();
+                return true;
             }
 
             progress = (progress - 1f) / progressFactor;
@@ -200,5 +222,10 @@ public class Enemy : GameBehavior
     {
         animator.Stop();
         OriginFactory.Reclaim(this);
+    }
+
+    private void OnDestroy()
+    {
+        animator.Destroy();
     }
 }
