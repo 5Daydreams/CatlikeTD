@@ -15,8 +15,8 @@ MonoBehaviour:
   spawnSequences:
   - factory: {fileID: 11400000, guid: e53c33a1becdc2f41a133416d51bf32c, type: 2}
     type: 2
-    amount: 1
-    cooldown: 2
+    amount: 2
+    cooldown: 3
   - factory: {fileID: 11400000, guid: e53c33a1becdc2f41a133416d51bf32c, type: 2}
     type: 0
     amount: 5

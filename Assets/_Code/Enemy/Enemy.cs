@@ -27,6 +27,17 @@ public class Enemy : GameBehavior
     private float pathOffset;
     private float Health { get; set; }
 
+    Collider targetPointCollider;
+
+    public Collider TargetPointCollider
+    {
+        set
+        {
+            Debug.Assert(targetPointCollider == null, "Redefined collider!");
+            targetPointCollider = value;
+        }
+    }
+
 
     public EnemyFactory OriginFactory
     {
@@ -37,6 +48,7 @@ public class Enemy : GameBehavior
             originFactory = value;
         }
     }
+    public bool IsValidTarget => animator.CurrentClip == EnemyAnimator.Clip.Move;
 
     public void SpawnOn(GameTile tile)
     {
@@ -63,6 +75,7 @@ public class Enemy : GameBehavior
         this.speed = speed / Mathf.Max(1.0f, scale);
         this.pathOffset = pathOffset;
         animator.PlayIntro();
+        targetPointCollider.enabled = false;
     }
 
     void PrepareNextState()
@@ -163,6 +176,7 @@ public class Enemy : GameBehavior
                 return true;
             }
             animator.PlayMove(speed / Scale);
+            targetPointCollider.enabled = true;
         }
         // note that the usage here requires SETTING ENUMS IN THE CORRECT ORDER.
         else if (animator.CurrentClip >= EnemyAnimator.Clip.ReachDestination)
@@ -178,6 +192,7 @@ public class Enemy : GameBehavior
         if (Health <= 0f)
         {
             animator.PlayDying();
+            targetPointCollider.enabled = false;
             return true;
         }
 
@@ -187,8 +202,8 @@ public class Enemy : GameBehavior
             if (tileTo == null) // to stop if the destination is found
             {
                 Game.EnemyReachedDestination();
-                //Recycle();
                 animator.PlayOutro();
+                targetPointCollider.enabled = false;
                 return true;
             }
 
